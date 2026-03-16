@@ -1,6 +1,3 @@
-// ═══════════════════════════════════════════════════
-//  LEARN LETTERS — Motor de Som
-// ═══════════════════════════════════════════════════
 var SoundEngine = (function() {
   var ctx = null, muted = false;
 
@@ -24,56 +21,59 @@ var SoundEngine = (function() {
   function playMatch() {
     if (muted) return;
     var c = getCtx(), now = c.currentTime;
-    tone(523.25,'sine',now,       0.12,0.3,c);
-    tone(659.25,'sine',now+0.10,  0.15,0.3,c);
-    tone(1046.5,'sine',now+0.18,  0.10,0.15,c);
+    tone(440,'square',now,      0.06,0.2,c);
+    tone(880,'square',now+0.07, 0.08,0.2,c);
+    tone(1320,'sine', now+0.13, 0.10,0.15,c);
   }
 
   function playError() {
     if (muted) return;
     var c = getCtx(), now = c.currentTime;
-    tone(220,'sawtooth',now,0.22,0.25,c,110);
+    tone(300,'sawtooth',now,0.18,0.22,c,120);
   }
 
   function playVictory() {
     if (muted) return;
     var c = getCtx(), now = c.currentTime;
-    var notes=[[523.25,0],[659.25,0.15],[783.99,0.30],[659.25,0.45],[1046.5,0.60]];
-    notes.forEach(function(n){ tone(n[0],'sine',now+n[1],0.18,0.35,c); });
-    [523.25,659.25,783.99].forEach(function(f){ tone(f,'triangle',now+0.80,0.6,0.2,c); });
-    tone(2093,'sine',now+0.85,0.4,0.1,c);
+    var melody = [[523,0.00],[659,0.12],[784,0.24],[1047,0.36],[1319,0.50],[1047,0.64],[1319,0.78]];
+    for (var i=0;i<melody.length;i++) tone(melody[i][0],'square',now+melody[i][1],0.14,0.25,c);
+    var chord = [523,659,784,1047];
+    for (var j=0;j<chord.length;j++) tone(chord[j],'sine',now+0.95,0.7,0.15,c);
+    tone(2093,'sine',now+1.0,0.4,0.08,c);
   }
 
   function playDefeat() {
     if (muted) return;
     var c = getCtx(), now = c.currentTime;
-    [[392,0],[349.23,0.22],[293.66,0.44],[261.63,0.66]].forEach(function(n){
-      tone(n[0],'triangle',now+n[1],0.25,0.3,c);
-    });
+    var notes = [[400,0],[320,0.2],[260,0.4],[200,0.65]];
+    for (var i=0;i<notes.length;i++) tone(notes[i][0],'triangle',now+notes[i][1],0.22,0.25,c);
   }
 
   function playClick() {
     if (muted) return;
     var c = getCtx(), now = c.currentTime;
-    tone(800,'sine',now,0.07,0.15,c);
+    tone(1000,'square',now,0.04,0.12,c);
   }
 
   function playCombo() {
     if (muted) return;
     var c = getCtx(), now = c.currentTime;
-    [660,880,1100,1320].forEach(function(f,i){ tone(f,'sine',now+i*0.07,0.1,0.2,c); });
+    var freqs = [660,880,1100,1320];
+    for (var i=0;i<freqs.length;i++) tone(freqs[i],'square',now+i*0.06,0.08,0.2,c);
   }
 
   function playCoins() {
     if (muted) return;
     var c = getCtx(), now = c.currentTime;
-    [1047,1319,1568].forEach(function(f,i){ tone(f,'sine',now+i*0.08,0.12,0.2,c); });
+    var freqs = [1047,1319,1568];
+    for (var i=0;i<freqs.length;i++) tone(freqs[i],'sine',now+i*0.08,0.12,0.2,c);
   }
 
   function playStreak() {
     if (muted) return;
     var c = getCtx(), now = c.currentTime;
-    [440,554,659,880,1108].forEach(function(f,i){ tone(f,'sine',now+i*0.1,0.12,0.22,c); });
+    var freqs = [440,554,659,880,1108];
+    for (var i=0;i<freqs.length;i++) tone(freqs[i],'square',now+i*0.1,0.12,0.22,c);
   }
 
   function toggleMute() {
@@ -83,7 +83,9 @@ var SoundEngine = (function() {
     return muted;
   }
 
-  return { playMatch:playMatch, playError:playError, playVictory:playVictory,
-           playDefeat:playDefeat, playClick:playClick, playCombo:playCombo,
-           playCoins:playCoins, playStreak:playStreak, toggleMute:toggleMute };
+  return {
+    playMatch:playMatch, playError:playError, playVictory:playVictory,
+    playDefeat:playDefeat, playClick:playClick, playCombo:playCombo,
+    playCoins:playCoins, playStreak:playStreak, toggleMute:toggleMute
+  };
 })();

@@ -1,66 +1,82 @@
 // ═══════════════════════════════════════════════════
-//  LETRAJONG — 30 NÍVEIS
-//  Cada nível define:
-//    cols, rows: tamanho do grid
-//    layers: número de camadas
-//    letters: letras usadas (cada uma aparece em pares)
-//    layout: 'pyramid' | 'cross' | 'diamond' | 'spiral' | 'castle' | 'random'
-//    timeLimit: segundos (0 = sem limite)
-//    hintCount: dicas disponíveis
+//  LEARN NUMBERS — 50 Níveis
+//  Símbolos: dígitos 1-9 e operadores +, -, ×
 // ═══════════════════════════════════════════════════
 
-const LEVELS = [
-  // ── FÁCIL (1–8) ── pequenos, poucas letras, 1 camada
-  { cols:4, rows:4, layers:1, pairs:6,  letters:'ABCDEF',        layout:'flat',    timeLimit:0,   hints:5, name:'Iniciante' },
-  { cols:4, rows:4, layers:1, pairs:7,  letters:'ABCDEFG',       layout:'flat',    timeLimit:0,   hints:5, name:'Primeiros Passos' },
-  { cols:5, rows:4, layers:1, pairs:8,  letters:'ABCDEFGH',      layout:'flat',    timeLimit:0,   hints:4, name:'Aquecimento' },
-  { cols:5, rows:4, layers:2, pairs:10, letters:'ABCDEFGHIJ',    layout:'pyramid', timeLimit:0,   hints:4, name:'Torre Baixa' },
-  { cols:6, rows:4, layers:2, pairs:10, letters:'ABCDEFGHIJ',    layout:'pyramid', timeLimit:180, hints:4, name:'Primeiros Blocos' },
-  { cols:6, rows:5, layers:2, pairs:12, letters:'ABCDEFGHIJKL',  layout:'cross',   timeLimit:180, hints:4, name:'Cruz Simples' },
-  { cols:6, rows:5, layers:2, pairs:13, letters:'ABCDEFGHIJKLM', layout:'cross',   timeLimit:150, hints:3, name:'Ampliando' },
-  { cols:7, rows:5, layers:2, pairs:14, letters:'ABCDEFGHIJKLMN',layout:'diamond', timeLimit:150, hints:3, name:'Diamante' },
+// Paleta de cores por símbolo
+const SYMBOL_COLORS = {
+  '1':'#FF6B6B','2':'#FF8E53','3':'#FFD93D','4':'#6BCB77',
+  '5':'#4ECDC4','6':'#45B7D1','7':'#A78BFA','8':'#F472B6',
+  '9':'#FB923C','+':'#34D399','-':'#60A5FA','×':'#C084FC',
+  '0':'#FCD34D'
+};
 
-  // ── MÉDIO (9–18) ── grids maiores, mais camadas, timer
-  { cols:7, rows:5, layers:2, pairs:16, letters:'ABCDEFGHIJKLMNOP',  layout:'pyramid', timeLimit:150, hints:3, name:'Pirâmide' },
-  { cols:7, rows:6, layers:3, pairs:18, letters:'ABCDEFGHIJKLMNOPQR',layout:'pyramid', timeLimit:140, hints:3, name:'Grande Torre' },
-  { cols:8, rows:6, layers:3, pairs:18, letters:'ABCDEFGHIJKLMNOPQR',layout:'cross',   timeLimit:140, hints:3, name:'Cruz Grande' },
-  { cols:8, rows:6, layers:3, pairs:20, letters:'ABCDEFGHIJKLMNOPQRST', layout:'cross', timeLimit:130, hints:3, name:'Vinte Pares' },
-  { cols:8, rows:6, layers:3, pairs:20, letters:'ABCDEFGHIJKLMNOPQRST', layout:'castle', timeLimit:130, hints:3, name:'Castelo' },
-  { cols:8, rows:7, layers:3, pairs:22, letters:'ABCDEFGHIJKLMNOPQRSTUV', layout:'castle', timeLimit:120, hints:2, name:'Fortaleza' },
-  { cols:9, rows:7, layers:3, pairs:22, letters:'ABCDEFGHIJKLMNOPQRSTUV', layout:'diamond', timeLimit:120, hints:2, name:'Grande Diamante' },
-  { cols:9, rows:7, layers:4, pairs:24, letters:'ABCDEFGHIJKLMNOPQRSTUVWX', layout:'pyramid', timeLimit:120, hints:2, name:'Quatro Andares' },
-  { cols:9, rows:7, layers:4, pairs:24, letters:'ABCDEFGHIJKLMNOPQRSTUVWX', layout:'spiral',  timeLimit:110, hints:2, name:'Espiral' },
-  { cols:10,rows:7, layers:4, pairs:26, letters:'ABCDEFGHIJKLMNOPQRSTUVWXYZ', layout:'spiral', timeLimit:110, hints:2, name:'Espiral Grande' },
-
-  // ── DIFÍCIL (19–25) ── tabuleiros grandes, mais camadas, timer curto
-  { cols:10,rows:8, layers:4, pairs:26, letters:'ABCDEFGHIJKLMNOPQRSTUVWXYZ', layout:'castle',  timeLimit:100, hints:2, name:'Cidadela' },
-  { cols:10,rows:8, layers:4, pairs:28, letters:'ABCDEFGHIJKLMNOPQRSTUVWXYZ', layout:'pyramid', timeLimit:100, hints:2, name:'Grande Pirâmide' },
-  { cols:10,rows:8, layers:5, pairs:28, letters:'ABCDEFGHIJKLMNOPQRSTUVWXYZ', layout:'cross',   timeLimit:90,  hints:2, name:'Cruz Épica' },
-  { cols:11,rows:8, layers:5, pairs:30, letters:'ABCDEFGHIJKLMNOPQRSTUVWXYZ', layout:'diamond', timeLimit:90,  hints:1, name:'Diamante Épico' },
-  { cols:11,rows:8, layers:5, pairs:30, letters:'ABCDEFGHIJKLMNOPQRSTUVWXYZ', layout:'spiral',  timeLimit:90,  hints:1, name:'Labirinto' },
-  { cols:11,rows:9, layers:5, pairs:32, letters:'ABCDEFGHIJKLMNOPQRSTUVWXYZ', layout:'castle',  timeLimit:80,  hints:1, name:'Bastilha' },
-  { cols:12,rows:9, layers:5, pairs:32, letters:'ABCDEFGHIJKLMNOPQRSTUVWXYZ', layout:'pyramid', timeLimit:80,  hints:1, name:'Colosso' },
-
-  // ── EXPERT (26–30) ── máxima dificuldade
-  { cols:12,rows:9, layers:6, pairs:34, letters:'ABCDEFGHIJKLMNOPQRSTUVWXYZ', layout:'spiral',  timeLimit:70,  hints:1, name:'Mestre' },
-  { cols:12,rows:9, layers:6, pairs:34, letters:'ABCDEFGHIJKLMNOPQRSTUVWXYZ', layout:'diamond', timeLimit:70,  hints:1, name:'Grão-Mestre' },
-  { cols:13,rows:9, layers:6, pairs:36, letters:'ABCDEFGHIJKLMNOPQRSTUVWXYZ', layout:'castle',  timeLimit:60,  hints:1, name:'Lendário' },
-  { cols:13,rows:9, layers:6, pairs:36, letters:'ABCDEFGHIJKLMNOPQRSTUVWXYZ', layout:'pyramid', timeLimit:60,  hints:1, name:'Épico' },
-  { cols:13,rows:10,layers:7, pairs:36, letters:'ABCDEFGHIJKLMNOPQRSTUVWXYZ', layout:'spiral',  timeLimit:60,  hints:1, name:'Transcendente' },
-];
-
-// Cores por letra (ciclo de 8 cores vibrantes)
-const LETTER_COLORS = [
-  '#e94560','#FF6B6B','#FF8E53','#FFD93D',
-  '#6BCB77','#4ECDC4','#45B7D1','#A78BFA',
-  '#F472B6','#FB923C','#34D399','#60A5FA',
-  '#C084FC','#F9A8D4','#86EFAC','#FCD34D',
-  '#67E8F9','#A5B4FC','#FCA5A5','#6EE7B7',
-  '#93C5FD','#D8B4FE','#FDE68A','#BBF7D0',
-  '#BAE6FD','#E9D5FF',
-];
-
-function getLetterColor(letter) {
-  const idx = letter.charCodeAt(0) - 65;
-  return LETTER_COLORS[idx % LETTER_COLORS.length];
+function getSymbolColor(sym) {
+  return SYMBOL_COLORS[sym] || '#ffffff';
 }
+
+// Conjuntos de símbolos por dificuldade
+const S_EASY   = '123456';           // 6 símbolos
+const S_MED    = '123456789';        // 9 símbolos
+const S_HARD   = '123456789+-';      // 11 símbolos
+const S_EXPERT = '123456789+-×';     // 12 símbolos
+
+const LEVELS = [
+  // ── FÁCIL (1–10) ────────────────────────────────
+  {n:'First Steps',    cols:4,rows:4,layers:1,pairs:6,  syms:S_EASY,   layout:'flat',    time:0,   hints:5},
+  {n:'Warm Up',        cols:4,rows:4,layers:1,pairs:7,  syms:S_EASY,   layout:'flat',    time:0,   hints:5},
+  {n:'Getting Started',cols:5,rows:4,layers:1,pairs:8,  syms:S_EASY,   layout:'flat',    time:0,   hints:4},
+  {n:'Low Tower',      cols:5,rows:4,layers:2,pairs:10, syms:S_EASY,   layout:'pyramid', time:0,   hints:4},
+  {n:'First Blocks',   cols:6,rows:4,layers:2,pairs:10, syms:S_EASY,   layout:'pyramid', time:200, hints:4},
+  {n:'Simple Cross',   cols:6,rows:5,layers:2,pairs:12, syms:S_MED,    layout:'cross',   time:200, hints:4},
+  {n:'Growing',        cols:6,rows:5,layers:2,pairs:13, syms:S_MED,    layout:'cross',   time:180, hints:3},
+  {n:'Diamond',        cols:7,rows:5,layers:2,pairs:14, syms:S_MED,    layout:'diamond', time:180, hints:3},
+  {n:'Plus Time',      cols:7,rows:5,layers:2,pairs:14, syms:S_MED+'+',layout:'flat',    time:170, hints:3},
+  {n:'Minus Moves',    cols:7,rows:5,layers:2,pairs:15, syms:S_MED+'-',layout:'pyramid', time:170, hints:3},
+
+  // ── MÉDIO (11–25) ────────────────────────────────
+  {n:'Pyramid',        cols:7,rows:5,layers:2,pairs:16, syms:S_MED,    layout:'pyramid', time:160, hints:3},
+  {n:'Big Tower',      cols:7,rows:6,layers:3,pairs:18, syms:S_MED,    layout:'pyramid', time:160, hints:3},
+  {n:'Big Cross',      cols:8,rows:6,layers:3,pairs:18, syms:S_MED,    layout:'cross',   time:150, hints:3},
+  {n:'Twenty Pairs',   cols:8,rows:6,layers:3,pairs:20, syms:S_HARD,   layout:'cross',   time:150, hints:3},
+  {n:'Castle',         cols:8,rows:6,layers:3,pairs:20, syms:S_HARD,   layout:'castle',  time:140, hints:3},
+  {n:'Fortress',       cols:8,rows:7,layers:3,pairs:22, syms:S_HARD,   layout:'castle',  time:140, hints:2},
+  {n:'Big Diamond',    cols:9,rows:7,layers:3,pairs:22, syms:S_HARD,   layout:'diamond', time:130, hints:2},
+  {n:'Four Floors',    cols:9,rows:7,layers:4,pairs:24, syms:S_HARD,   layout:'pyramid', time:130, hints:2},
+  {n:'Spiral',         cols:9,rows:7,layers:4,pairs:24, syms:S_HARD,   layout:'spiral',  time:120, hints:2},
+  {n:'Big Spiral',     cols:10,rows:7,layers:4,pairs:26,syms:S_HARD,   layout:'spiral',  time:120, hints:2},
+  {n:'Operators',      cols:8,rows:6,layers:3,pairs:20, syms:S_EXPERT, layout:'pyramid', time:130, hints:2},
+  {n:'Math Castle',    cols:9,rows:6,layers:3,pairs:22, syms:S_EXPERT, layout:'castle',  time:125, hints:2},
+  {n:'Times Table',    cols:9,rows:7,layers:3,pairs:24, syms:S_EXPERT, layout:'cross',   time:120, hints:2},
+  {n:'Citadel',        cols:10,rows:7,layers:4,pairs:26,syms:S_EXPERT, layout:'castle',  time:115, hints:2},
+  {n:'Great Pyramid',  cols:10,rows:8,layers:4,pairs:28,syms:S_EXPERT, layout:'pyramid', time:110, hints:2},
+
+  // ── DIFÍCIL (26–40) ─────────────────────────────
+  {n:'Epic Cross',     cols:10,rows:8,layers:4,pairs:28,syms:S_EXPERT, layout:'cross',   time:105, hints:2},
+  {n:'Epic Diamond',   cols:10,rows:8,layers:5,pairs:30,syms:S_EXPERT, layout:'diamond', time:100, hints:2},
+  {n:'Labyrinth',      cols:11,rows:8,layers:5,pairs:30,syms:S_EXPERT, layout:'spiral',  time:100, hints:1},
+  {n:'Bastille',       cols:11,rows:8,layers:5,pairs:32,syms:S_EXPERT, layout:'castle',  time:95,  hints:1},
+  {n:'Colossus',       cols:11,rows:9,layers:5,pairs:32,syms:S_EXPERT, layout:'pyramid', time:95,  hints:1},
+  {n:'Master',         cols:12,rows:9,layers:5,pairs:34,syms:S_EXPERT, layout:'spiral',  time:90,  hints:1},
+  {n:'Grand Master',   cols:12,rows:9,layers:6,pairs:34,syms:S_EXPERT, layout:'diamond', time:88,  hints:1},
+  {n:'Legend',         cols:12,rows:9,layers:6,pairs:36,syms:S_EXPERT, layout:'castle',  time:85,  hints:1},
+  {n:'Epic',           cols:12,rows:9,layers:6,pairs:36,syms:S_EXPERT, layout:'pyramid', time:82,  hints:1},
+  {n:'Transcendent',   cols:13,rows:9,layers:6,pairs:36,syms:S_EXPERT, layout:'spiral',  time:80,  hints:1},
+  {n:'Ultra',          cols:13,rows:10,layers:6,pairs:38,syms:S_EXPERT,layout:'castle',  time:78,  hints:1},
+  {n:'Titan',          cols:13,rows:10,layers:6,pairs:38,syms:S_EXPERT,layout:'pyramid', time:75,  hints:1},
+
+  // ── EXPERT (41–50) ──────────────────────────────
+  {n:'Omega',          cols:13,rows:10,layers:7,pairs:40,syms:S_EXPERT,layout:'spiral',  time:72,  hints:1},
+  {n:'Infinity',       cols:14,rows:10,layers:7,pairs:40,syms:S_EXPERT,layout:'diamond', time:70,  hints:1},
+  {n:'Singularity',    cols:14,rows:10,layers:7,pairs:42,syms:S_EXPERT,layout:'castle',  time:68,  hints:1},
+  {n:'Quantum',        cols:14,rows:10,layers:7,pairs:42,syms:S_EXPERT,layout:'pyramid', time:65,  hints:1},
+  {n:'Nebula',         cols:14,rows:11,layers:7,pairs:44,syms:S_EXPERT,layout:'spiral',  time:63,  hints:1},
+  {n:'Cosmos',         cols:14,rows:11,layers:7,pairs:44,syms:S_EXPERT,layout:'diamond', time:60,  hints:1},
+  {n:'Supernova',      cols:15,rows:11,layers:7,pairs:46,syms:S_EXPERT,layout:'castle',  time:58,  hints:1},
+  {n:'Black Hole',     cols:15,rows:11,layers:8,pairs:46,syms:S_EXPERT,layout:'spiral',  time:55,  hints:1},
+  {n:'Big Bang',       cols:15,rows:11,layers:8,pairs:48,syms:S_EXPERT,layout:'pyramid', time:52,  hints:1},
+  {n:'Wormhole',      cols:15,rows:11,layers:8,pairs:46,syms:S_EXPERT,layout:'diamond', time:57,  hints:1},
+  {n:'Dark Matter',    cols:15,rows:12,layers:8,pairs:48,syms:S_EXPERT,layout:'castle',  time:54,  hints:1},
+  {n:'Multiverse',     cols:15,rows:12,layers:8,pairs:48,syms:S_EXPERT,layout:'cross',   time:51,  hints:1},
+  {n:'GODMODE',        cols:15,rows:12,layers:8,pairs:50,syms:S_EXPERT,layout:'spiral',  time:50,  hints:1},
+];
