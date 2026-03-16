@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Learn Numbers — Math Mahjong</title>
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0d0d1a">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Learn Numbers">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <!-- Fontes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ═══ MENU ═══ -->
+<div id="screen-menu" class="screen active">
+  <div class="menu-bg">
+    <div class="float-num" style="--d:0s;--x:8%;--y:12%;--r:-15deg;--c:#FF6B6B">7</div>
+    <div class="float-num" style="--d:0.4s;--x:78%;--y:8%;--r:20deg;--c:#4ECDC4">3</div>
+    <div class="float-num" style="--d:0.8s;--x:20%;--y:72%;--r:-8deg;--c:#FFE66D">+</div>
+    <div class="float-num" style="--d:1.2s;--x:72%;--y:68%;--r:12deg;--c:#A8E6CF">×</div>
+    <div class="float-num" style="--d:1.6s;--x:45%;--y:82%;--r:-20deg;--c:#FF8B94">5</div>
+    <div class="float-num" style="--d:0.2s;--x:4%;--y:48%;--r:25deg;--c:#C084FC">−</div>
+    <div class="float-num" style="--d:0.6s;--x:88%;--y:42%;--r:-10deg;--c:#60A5FA">9</div>
+    <div class="float-num" style="--d:1s;--x:55%;--y:18%;--r:8deg;--c:#FB923C">2</div>
+  </div>
+
+  <div class="menu-content">
+    <!-- Streak badge -->
+    <div class="streak-badge" id="menu-streak">🔥 <span id="streak-count">0</span> dias</div>
+
+    <div class="logo">
+      <div class="logo-top">
+        <span class="logo-l" style="--c:#FF6B6B">L</span><span class="logo-l" style="--c:#FFE66D">e</span><span class="logo-l" style="--c:#4ECDC4">a</span><span class="logo-l" style="--c:#A8E6CF">r</span><span class="logo-l" style="--c:#FF8B94">n</span>
+      </div>
+      <div class="logo-bot">
+        <span class="logo-l" style="--c:#FB923C">N</span><span class="logo-l" style="--c:#34D399">u</span><span class="logo-l" style="--c:#60A5FA">m</span><span class="logo-l" style="--c:#C084FC">b</span><span class="logo-l" style="--c:#F472B6">e</span><span class="logo-l" style="--c:#FCD34D">r</span><span class="logo-l" style="--c:#4ECDC4">s</span>
+      </div>
+    </div>
+    <p class="menu-sub">Match the math — clear the board!</p>
+
+    <!-- Moedas -->
+    <div class="coins-display" id="menu-coins">🪙 <span id="coin-count">0</span></div>
+
+    <button class="btn-primary" onclick="showLevelSelect()">🎮 Play</button>
+    <button class="btn-secondary" onclick="showRanking()">🏆 Ranking</button>
+    <button class="btn-secondary" onclick="showHowTo()">❓ How to Play</button>
+    <button class="btn-premium" onclick="showPremium()">⭐ Remove Ads — $1</button>
+  </div>
+</div>
+
+<!-- ═══ HOW TO PLAY ═══ -->
+<div id="screen-howto" class="screen">
+  <div class="howto-container">
+    <h2>How to Play</h2>
+    <div class="howto-steps">
+      <div class="step"><div class="step-icon">👆</div><p>Tap a tile to select it</p></div>
+      <div class="step"><div class="step-icon">🔢</div><p>Find another tile with the <strong>same symbol</strong></p></div>
+      <div class="step"><div class="step-icon">🔓</div><p>Tiles must be <strong>free</strong> — nothing on top</p></div>
+      <div class="step"><div class="step-icon">✨</div><p>Matched pair disappears! Clear all tiles to win!</p></div>
+      <div class="step"><div class="step-icon">🪙</div><p>Earn <strong>coins</strong> every level — buy hints!</p></div>
+      <div class="step"><div class="step-icon">🔥</div><p>Play daily to keep your <strong>streak</strong> alive!</p></div>
+    </div>
+    <button class="btn-primary" onclick="showMenu()">← Back</button>
+  </div>
+</div>
+
+<!-- ═══ RANKING ═══ -->
+<div id="screen-ranking" class="screen">
+  <div class="howto-container">
+    <h2>🏆 Top Players</h2>
+    <div id="ranking-list" class="ranking-list"></div>
+    <button class="btn-primary" onclick="showMenu()">← Back</button>
+  </div>
+</div>
+
+<!-- ═══ PREMIUM ═══ -->
+<div id="screen-premium" class="screen">
+  <div class="howto-container premium-box">
+    <div style="font-size:3rem">⭐</div>
+    <h2>Go Premium!</h2>
+    <ul class="premium-perks">
+      <li>✅ Remove all ads forever</li>
+      <li>✅ Unlock all 50 levels instantly</li>
+      <li>✅ 100 bonus coins</li>
+      <li>✅ Exclusive gold tile theme</li>
+    </ul>
+    <p class="premium-price">Only <strong>$1.00</strong> — one time!</p>
+    <button class="btn-premium" onclick="activatePremium()">⭐ Buy Premium — $1</button>
+    <p class="premium-note">* Payment integration via Stripe/Pix — configure your key in js/payment.js</p>
+    <button class="btn-secondary" onclick="showMenu()">← Back</button>
+  </div>
+</div>
+
+<!-- ═══ LEVEL SELECT ═══ -->
+<div id="screen-levels" class="screen">
+  <div class="levels-header">
+    <button class="btn-back" onclick="showMenu()">←</button>
+    <div>
+      <h2>Choose Level</h2>
+      <span class="coins-small">🪙 <span id="coins-levels">0</span></span>
+    </div>
+    <div class="streak-small">🔥 <span id="streak-levels">0</span></div>
+  </div>
+  <div class="levels-grid" id="levels-grid"></div>
+</div>
+
+<!-- ═══ GAME ═══ -->
+<div id="screen-game" class="screen">
+  <div class="game-header">
+    <button class="btn-back" onclick="confirmBack()">←</button>
+    <div class="game-info">
+      <span class="level-badge" id="level-badge">Level 1</span>
+      <span class="score-display" id="score-display">🪙 0</span>
+    </div>
+    <div class="game-actions">
+      <button class="btn-hint" id="btn-hint" onclick="useHint()">💡 <span id="hint-count">3</span></button>
+      <button class="btn-shuffle" onclick="shuffleFree()">🔀</button>
+      <button class="btn-shuffle" id="btn-mute" onclick="SoundEngine.toggleMute()">🔊</button>
+    </div>
+  </div>
+
+  <div class="timer-bar-wrap"><div class="timer-bar" id="timer-bar"></div></div>
+
+  <!-- Combo display -->
+  <div class="combo-display hidden" id="combo-display">🔥 COMBO x<span id="combo-num">2</span></div>
+
+  <div class="board-container">
+    <div class="board" id="board"></div>
+  </div>
+
+  <div class="game-footer">
+    <span id="pairs-left">Pairs: 0</span>
+    <span id="streak-game">🔥 <span id="streak-game-count">0</span></span>
+    <span id="moves-count">Moves: 0</span>
+  </div>
+
+  <!-- AD BANNER -->
+  <div class="ad-banner" id="ad-banner">
+    <span class="ad-label">AD</span>
+    <span class="ad-text">🎯 Match numbers, train your brain!</span>
+    <button class="ad-close" onclick="showPremium()">⭐ Remove</button>
+  </div>
+</div>
+
+<!-- ═══ MODAIS ═══ -->
+<div id="modal-win" class="modal hidden">
+  <div class="modal-box win-box">
+    <div class="win-emoji" id="win-emoji">🎉</div>
+    <h2>Level Complete!</h2>
+    <div class="stars-display" id="stars-display"></div>
+    <div class="win-coins" id="win-coins"></div>
+    <p id="win-message"></p>
+    <!-- Nudge: próximo nível é desbloqueado! -->
+    <p class="nudge-msg" id="nudge-msg"></p>
+    <div class="modal-actions">
+      <button class="btn-primary" onclick="nextLevel()">Next Level →</button>
+      <button class="btn-secondary" onclick="restartLevel()">🔄 Replay</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-lose" class="modal hidden">
+  <div class="modal-box lose-box">
+    <div class="win-emoji">😅</div>
+    <h2>No more moves!</h2>
+    <p>Use a hint next time!</p>
+    <div class="modal-actions">
+      <button class="btn-primary" onclick="restartLevel()">🔄 Try Again</button>
+      <button class="btn-secondary" onclick="showLevelSelect()">📋 Levels</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-confirm" class="modal hidden">
+  <div class="modal-box">
+    <h2>Leave level?</h2>
+    <p>Your progress will be lost.</p>
+    <div class="modal-actions">
+      <button class="btn-primary" onclick="goToLevels()">Leave</button>
+      <button class="btn-secondary" onclick="closeModal('modal-confirm')">Continue</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de streak! -->
+<div id="modal-streak" class="modal hidden">
+  <div class="modal-box streak-box">
+    <div class="win-emoji">🔥</div>
+    <h2 id="streak-modal-title">3 Day Streak!</h2>
+    <p id="streak-modal-msg">You're on fire! Keep playing daily!</p>
+    <div class="modal-actions">
+      <button class="btn-primary" onclick="closeModal('modal-streak')">Let's Go! 🚀</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/levels.js"></script>
+<script src="js/sound.js"></script>
+<script src="js/game.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/sw.js')
+      .catch(function(e) { console.log('SW:', e); });
+  });
+}
+</script>
+</body>
+</html>
