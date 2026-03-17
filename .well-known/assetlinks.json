@@ -1,0 +1,11 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "io.github.pauloplanob1402.learnnumbers",
+      "sha256_cert_fingerprints":
+        ["8D:F9:0D:B8:4A:16:75:68:AB:29:15:63:23:64:A6:F4:0F:56:D1:71:B8:2F:80:3B:53:E4:4A:FD:73:EA:61:63"]
+    }
+  }
+]
