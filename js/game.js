@@ -532,4 +532,5 @@ document.addEventListener('DOMContentLoaded',()=>{
     document.getElementById('ad-banner').classList.add('hidden');
   }
   showScreen('screen-menu');
+  setTimeout(function(){ SoundEngine.playIntroMusic(); }, 700);
 });
